@@ -1,6 +1,8 @@
 # table2map
 
-Page de test pour afficher des données stoquées sous forme de table sur une carte sans soliciter les GAFAM
+![](doc/figure1.png)
+
+Page de test pour afficher des adresses stoquées sous forme de table sur une carte sans soliciter les GAFAM
 
 Pour les géolocalisations on utilise [leaflet](https://leafletjs.com/) qui s'appuie sur des fonds de carte [OpenStreetMap](https://www.openstreetmap.org)
 
@@ -24,7 +26,5 @@ Il y a 4 colonnes :
 - label
 
 Pour chaque ligne on utilise adresse+code postal+ville, la 4eme colonne sert juste pour le label et ne transite pas sur le réseau pour l'API Adresse.
-
-![](doc/figure1.png)
 
 Je lis les data directement depuis la classeur framacalc, il y a aussi une fonction pout lire un fichier CSV local. A voir.
