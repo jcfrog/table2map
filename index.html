@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>csv2map</title>
+    <link rel="stylesheet" href="leaflet/leaflet.css" />
+    <script src="leaflet/leaflet.js"></script>
+    <script src="js/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <style>
+        #map {
+            width: 600px;
+            height: 400px;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+    <input type="file" name="datafn" id="datafn"><button onclick="load_data();">Load Data</button>
+    <div id="map"></div>
+    <script>
+
+        // data source : https://lite.framacalc.org/dan8d6zlfh-9vuw
+
+        // load ethercalc data from id
+        function loadDataFromId(id) {
+            $.ajax({
+                url: "https://lite.framacalc.org/_/" + id + "/csv.json",
+                dataType: "text",
+                success: function(data) {
+                    var addresses = JSON.parse(data)
+                    //console.log(addresses)
+                    for (var i = 0; i < addresses.length; i++) {
+                        var address = addresses[i]
+                        var title = address[3]
+                        var addressSearchString = address[0] + "+" + address[1] + "+" + address[2]
+                        addressSearchString = addressSearchString.replace(/ /g,"+");
+                        console.log("searched string : ", address)
+                        addToMap(address,title);
+                    }
+                }
+            });
+        }
+
+        // get coordinates from address using french geocoding service
+        function addToMap(address, title = "") {
+            var options = "&autocomplete=0&addressdetails=1&limit=1";
+            var url = "https://api-adresse.data.gouv.fr/search/?q=" + address + options;
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4) {
+                    var json = JSON.parse(xhr.responseText);
+                    if (json.features.length > 0) {
+                        var lat = json.features[0].geometry.coordinates[1];
+                        var lon = json.features[0].geometry.coordinates[0];
+                        console.log(lat + " " + lon);
+                        addMarkerLeaflet(map, lat, lon, title);
+                    }
+                }
+            }
+            xhr.send();
+        }
+
+        function addMarkerLeaflet(map, lat, lon, title) {
+            var marker = L.marker([lat, lon]).addTo(map);
+            if (title.length > 0){
+                marker.bindPopup(title).openPopup();
+            }
+        }
+
+        function initLeafletMap(divId){
+            var map = L.map(divId).setView([46.130026,3.432393], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            return map;
+        }
+        
+        var map = null;
+        $(document).ready(function() {
+            map = initLeafletMap("map");
+            //readAddressesFromCSV("data.csv");
+        });
+
+        function readAddressesFromCSV(fileName){
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", fileName, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4) {
+                    console.log(xhr.responseText.length);
+                    var lines = xhr.responseText.split("\n");
+                    for (var i = 0; i < lines.length; i++) {
+                        var line = lines[i];
+                        if (line.length > 0) {
+                            var fields = line.split(";");
+                            var title = fields[3]
+                            address = fields[0]+","+fields[1]+","+fields[2];
+                            address = address.replace(/ /g,"+");
+                            console.log("searched string : ", address)
+                            addToMap(address,title);
+                        }
+                    }
+                }
+            }
+            xhr.send();
+        }
+
+        function load_data(){
+            var datafn = $("#datafn").val();
+            console.log(datafn);
+            readAddressesFromCSV(datafn);
+        }
+        
+
+    </script>
+</body>
+</html>
