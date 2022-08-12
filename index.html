@@ -13,20 +13,24 @@
 <body>
     <style>
         #map {
-            width: 600px;
-            height: 400px;
+            width: 100%;
+            height: 600px;
             padding: 0;
             margin: 0;
         }
     </style>
-    <input type="file" name="datafn" id="datafn"><button onclick="load_data();">Load Data</button>
+
+
+
     <div id="map"></div>
+
+
+
     <script>
 
         // data source : https://lite.framacalc.org/dan8d6zlfh-9vuw
-
         // load ethercalc data from id
-        function loadDataFromId(id) {
+        function loadDataFromEthercalcId(id) {
             $.ajax({
                 url: "https://lite.framacalc.org/_/" + id + "/csv.json",
                 dataType: "text",
@@ -38,14 +42,38 @@
                         var title = address[3]
                         var addressSearchString = address[0] + "+" + address[1] + "+" + address[2]
                         addressSearchString = addressSearchString.replace(/ /g,"+");
-                        console.log("searched string : ", address)
-                        addToMap(address,title);
+                        console.log("searched string : ", addressSearchString)
+                        console.log("results : ", addressSearchString)
+                        addToMap(addressSearchString,title);
                     }
                 }
             });
         }
+        function addToMap(address, title = "") {
+            var options = "&autocomplete=0&addressdetails=1&limit=1";
+            var url = "https://api-adresse.data.gouv.fr/search/?q=" + address + options;
+            console.log(url)
+            $.ajax({
+                url: url,
+                dataType: "text",
+                success: function(data) {
+                    var results = JSON.parse(data)
+                    //console.log(results)
+                    if (results.features.length > 0) {
+                        var feature = results.features[0]
+                        var lat = feature.geometry.coordinates[1]
+                        var lon = feature.geometry.coordinates[0]
+                        console.log(lat + " " + lon);
+                        addMarkerLeaflet(map, lat, lon, title);
+                    }else{
+                        console.log("error, returned empty",address)
+                    }
+                }
 
-        // get coordinates from address using french geocoding service
+            })
+        }
+
+        /*// get coordinates from address using french geocoding service
         function addToMap(address, title = "") {
             var options = "&autocomplete=0&addressdetails=1&limit=1";
             var url = "https://api-adresse.data.gouv.fr/search/?q=" + address + options;
@@ -59,11 +87,13 @@
                         var lon = json.features[0].geometry.coordinates[0];
                         console.log(lat + " " + lon);
                         addMarkerLeaflet(map, lat, lon, title);
+                    }else{
+                        console.log("error, returned empty",address)
                     }
                 }
             }
             xhr.send();
-        }
+        }*/
 
         function addMarkerLeaflet(map, lat, lon, title) {
             var marker = L.marker([lat, lon]).addTo(map);
@@ -84,6 +114,7 @@
         $(document).ready(function() {
             map = initLeafletMap("map");
             //readAddressesFromCSV("data.csv");
+            loadDataFromEthercalcId("dan8d6zlfh-9vuw");
         });
 
         function readAddressesFromCSV(fileName){
@@ -109,11 +140,6 @@
             xhr.send();
         }
 
-        function load_data(){
-            var datafn = $("#datafn").val();
-            console.log(datafn);
-            readAddressesFromCSV(datafn);
-        }
         
 
     </script>
