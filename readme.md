@@ -1,6 +1,6 @@
 # table2map
 
-![](doc/figure1.png)
+![](doc/figure0.png)
 
 Page de test pour afficher des adresses stoquées sous forme de table sur une carte sans soliciter les GAFAM
 
@@ -16,6 +16,9 @@ Il existe une **API Adresse** sur https://adresse.data.gouv.fr qui semble foncti
 L'idée est de parcourir la table des adresses et pour chaque ligne, faire une requête à cette **API Adresse** afin de récupérer les coordonnées.
 
 Une fois les coordonnées récupérées, on crée un marqueur sur la carte avec ***leaflet***
+
+![](doc/figure1.png)
+
 
 Dans cet exemple, les adresses sont stockées dans un tableur Ethercal chez Framasoft, service [Framacalc](https://framacalc)
 
