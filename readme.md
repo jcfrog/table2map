@@ -30,4 +30,4 @@ Il y a 4 colonnes :
 
 Pour chaque ligne on utilise adresse+code postal+ville, la 4eme colonne sert juste pour le label et ne transite pas sur le réseau pour l'API Adresse.
 
-Je lis les data directement depuis la classeur framacalc, il y a aussi une fonction pout lire un fichier CSV local. A voir.
+Je lis les data directement depuis le classeur framacalc, il y a aussi une fonction pout lire un fichier CSV local. A voir.
